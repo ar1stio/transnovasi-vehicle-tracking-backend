@@ -6,30 +6,78 @@
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
-      const socket = io("ws://localhost:3000");
-      const vehicleIds = ['vehicle-123', 'vehicle-456', 'vehicle-789']; // ← Daftar kendaraan
       const log = document.getElementById("log");
 
-      socket.on("connect", () => {
-        log.innerText += "Connected\n";
-        vehicleIds.forEach(vehicleId => {
-          socket.emit("join-vehicle", { vehicleId });
-          log.innerText += `Joining vehicle: ${vehicleId}\n`;
+      // Ganti dengan kredensial customer kamu
+      const email = "customer@example.com";
+      const password = "123456";
+
+      let token = null;
+      const vehicleIds = [];
+
+      // Step 1: Login to get token
+      async function loginAndStart() {
+        try {
+          const res = await fetch("http://localhost:3000/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await res.json();
+          token = data.access_token;
+
+          if (!token) throw new Error("Login failed");
+          log.innerText += "Login successful\n";
+
+          await loadVehicles();
+          connectSocket();
+        } catch (err) {
+          log.innerText += "Error: " + err.message + "\n";
+        }
+      }
+
+      // Step 2: Fetch vehicles using token
+      async function loadVehicles() {
+        const res = await fetch("http://localhost:3000/vehicles", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-      });
+        const vehicles = await res.json();
+        log.innerText += `Fetched ${vehicles.length} vehicles\n`;
 
-      socket.on("location-update", (data) => {
-        // data harus mengandung vehicleId, lat, lng
-        console.log(data,"data")
-        console.log(data,"data")
-        const { vehicleId, latitude, longitude, timestamp } = data;
-        log.innerText += `Vehicle ${vehicleId} → Lat: ${data.latitude}, Lng: ${data.longitude} (${data.timestamp || 'no time'})\n`;
-        log.scrollTop = log.scrollHeight;
-      });
+        vehicles.forEach((v) => {
+          vehicleIds.push(v.id);
+        });
+      }
 
-      socket.on("disconnect", () => {
-        log.innerText += "Disconnected\n";
-      });
+      // Step 3: Connect to socket and join each vehicle
+      function connectSocket() {
+        const socket = io("ws://localhost:3000", {
+          auth: { token }, // optional, depending on your gateway guard
+        });
+
+        socket.on("connect", () => {
+          log.innerText += "Connected to WebSocket\n";
+
+          vehicleIds.forEach((vehicleId) => {
+            socket.emit("join-vehicle", { vehicleId });
+            log.innerText += `Joining vehicle: ${vehicleId}\n`;
+          });
+        });
+
+        socket.on("location-update", (data) => {
+          const { vehicleId, latitude, longitude, timestamp } = data;
+          log.innerText += `Vehicle ${vehicleId} → Lat: ${latitude}, Lng: ${longitude} (${timestamp || 'no time'})\n`;
+          log.scrollTop = log.scrollHeight;
+        });
+
+        socket.on("disconnect", () => {
+          log.innerText += "Disconnected from WebSocket\n";
+        });
+      }
+
+      loginAndStart();
     </script>
   </body>
 </html>

@@ -76,6 +76,12 @@ netstat -ano | findstr 6379
 taskkill /PID 20316 /F
 ```
 
+## credential for demo
+```bash
+email = "customer@example.com";    
+password = "123456";
+```
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
