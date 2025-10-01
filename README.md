@@ -62,15 +62,19 @@ $ npm run test:cov
 http://localhost:3000/api
 
 ## plugin
+```bash
+# code plugin
 npm install --save @nestjs/websockets @nestjs/platform-socket.io socket.io redis ioredis uuid
 npm install --save @nestjs/serve-static
 npm install @nestjs/typeorm typeorm pg
 npm install @nestjs/jwt passport-jwt passport @nestjs/passport bcrypt
+```
 
 ## redis when conflict
+```bash
 netstat -ano | findstr 6379
 taskkill /PID 20316 /F
- 
+```
 
 ## Deployment
 
