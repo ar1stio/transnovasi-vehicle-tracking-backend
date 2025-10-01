@@ -9,7 +9,16 @@ async function bootstrap() {
     .setTitle('Vehicle Tracking API')
     .setDescription('API for tracking and managing vehicles')
     .setVersion('1.0')
-    .addBearerAuth() 
+    .addBearerAuth( 
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+        name: 'Authorization',
+        description: 'Masukkan token hasil login (tanpa kata Bearer)',
+      }
+    )
     .build();
     
   const document = SwaggerModule.createDocument(app, config);

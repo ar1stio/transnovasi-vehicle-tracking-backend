@@ -1,7 +1,9 @@
 import { Controller, Request, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { VehicleService } from '../../application/vehicle.service';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { CreateVehicleDto } from '../../dto/create-vehicle.dto';
+import { UpdateVehicleDto } from '../../dto/update-vehicle.dto';
 
 @ApiBearerAuth()
 @ApiTags('vehicles')
@@ -13,6 +15,7 @@ export class VehicleController {
   @Post()
   @ApiOperation({ summary: 'Create new vehicle' })
   @ApiResponse({ status: 201, description: 'Vehicle created' })
+  @ApiBody({ type: CreateVehicleDto })
   async create(@Request() req, @Body() body: { make: string; model: string; plateNumber: string }) {
     const customer = req.user; // JWT payload
     return this.vehicleService.create(body.make, body.model, body.plateNumber, customer.id);
@@ -38,6 +41,7 @@ export class VehicleController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update vehicle' })
+  @ApiBody({ type: UpdateVehicleDto })
   async update(
     @Param('id') id: string,
     @Request() req,
