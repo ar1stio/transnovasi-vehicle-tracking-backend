@@ -78,8 +78,13 @@ taskkill /PID 20316 /F
 
 ## credential for demo
 ```bash
-email = "customer@example.com";    
-password = "123456";
+email = "customer@example.com"  
+password = "123456"
+```
+
+## db name
+```bash
+transnovation
 ```
 
 ## Deployment
