@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h3>Tracking Multiple Vehicles</h3>
+    <pre id="log"></pre>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      const socket = io("ws://localhost:3000");
+      const vehicleIds = ['vehicle-123', 'vehicle-456', 'vehicle-789']; // ← Daftar kendaraan
+      const log = document.getElementById("log");
+
+      socket.on("connect", () => {
+        log.innerText += "Connected\n";
+        vehicleIds.forEach(vehicleId => {
+          socket.emit("join-vehicle", { vehicleId });
+          log.innerText += `Joining vehicle: ${vehicleId}\n`;
+        });
+      });
+
+      socket.on("location-update", (data) => {
+        // data harus mengandung vehicleId, lat, lng
+        console.log(data,"data")
+        console.log(data,"data")
+        const { vehicleId, latitude, longitude, timestamp } = data;
+        log.innerText += `Vehicle ${vehicleId} → Lat: ${data.latitude}, Lng: ${data.longitude} (${data.timestamp || 'no time'})\n`;
+        log.scrollTop = log.scrollHeight;
+      });
+
+      socket.on("disconnect", () => {
+        log.innerText += "Disconnected\n";
+      });
+    </script>
+  </body>
+</html>
